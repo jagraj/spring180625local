@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "spring180625local-service"
+spec:
+  # if your cluster supports it, uncomment the following to automatically create
+  # an external load-balanced IP for the frontend service.
+  #type: LoadBalancer
+  type: NodePort
+  ports:
+  # the port that this service should serve on
+  - name: http
+    port: 8080
+
+  selector:
+    app: "spring180625local-selector"
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "spring180625local-deployment"
+spec:
+  # this replicas value is default
+  # modify it according to your case
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "spring180625local-selector"
+    spec:
+      containers:
+      - name: spring180625local
+        image: spring180625local:latest
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 20
+        # resources:
+        #   requests:
+        #     cpu: 100m
+        #     memory: 100Mi
